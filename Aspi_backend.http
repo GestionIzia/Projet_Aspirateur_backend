@@ -1,0 +1,6 @@
+@Aspi_backend_HostAddress = http://localhost:5244
+
+GET {{Aspi_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
