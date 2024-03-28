@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Aspi_backend.Services;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ namespace Aspi_backend
     {
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
+            services.AddScoped<IScrapingService, WTTJScrapingService>();
             services.AddMvc();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
@@ -26,7 +29,6 @@ namespace Aspi_backend
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
-
 
         }
 
