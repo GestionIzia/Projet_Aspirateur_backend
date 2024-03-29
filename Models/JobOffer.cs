@@ -3,6 +3,7 @@ namespace Aspi_backend.Models
 {
     public class JobOffer
     {
+        public string? WebSite { get; set; }
         public string? CompanieName { get; set; }
         public string? JobTitle { get; set; }
         public string? ContractType { get; set; }
