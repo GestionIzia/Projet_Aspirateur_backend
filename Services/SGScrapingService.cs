@@ -8,18 +8,18 @@ using OpenQA.Selenium.Edge;
 
 namespace Aspi_backend.Services
 {
-    public class WTTJScrapingService : IWTTJScrapingService
+    public class SGScrapingService : ISGScrapingService
     {
         private readonly HttpClient _httpClient;
 
-        public WTTJScrapingService(HttpClient httpClient)
+        public SGScrapingService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<List<JobOffer>> ScrapeWTTJOffers() // Renommer la méthode ici
+        public async Task<List<JobOffer>> ScrapeSGOffers() // Renommer la méthode ici
         {
-            List<JobOffer> WTTJjobOffers = new List<JobOffer>();
+            List<JobOffer> SGjobOffers = new List<JobOffer>();
 
             var edgeDriverPath = "C:\\Users\\Bradley GOEH AKUE\\Desktop\\ME\\msedgedriver.exe";
             var edgeOptions = new EdgeOptions();
@@ -29,35 +29,35 @@ namespace Aspi_backend.Services
             try
             {
 
-                driver.Navigate().GoToUrl("https://www.welcometothejungle.com/fr/jobs?query=apprentissage");
+                driver.Navigate().GoToUrl("https://careers.societegenerale.com/rechercher?refinementList[jobType][0]=APPRENTICESHIP");
 
                 await Task.Delay(5000); // Utiliser Task.Delay au lieu de Thread.Sleep dans un contexte asynchrone
 
-                var cardElements = driver.FindElements(By.XPath("//*[@id='pages_jobs']/div[2]/div/ul/li[position() <= 12]/div/div"));
+                var cardElements = driver.FindElements(By.CssSelector(".oJob-offer"));
 
                 if (cardElements != null)
                 {
-                    Console.WriteLine("Offres en apprentissage sur Welcome to the Jungle :");
-                    foreach (var cardElement in cardElements)
+                    Console.WriteLine("Offres en apprentissage sur Société Générale :");
+                    foreach (var cardElement in cardElements.Take(5))
                     {
                         JobOffer jobOffer = new JobOffer
                         {
-                            WebSite = "WTTJ",
-                            CompanieName = cardElement.FindElement(By.XPath("./div/div[1]/span")).Text,
-                            JobTitle = cardElement.FindElement(By.XPath("./div/div[2]/a/h4/div")).Text,
-                            ContractType = cardElement.FindElement(By.XPath("./div/div[2]/div[2]/div/span")).Text,
-                            Location = cardElement.FindElement(By.XPath("./div/div[2]/div[1]/p/span/span")).Text,
-                            Date = cardElement.FindElement(By.XPath("./div/div[2]/div[3]/div[1]/p/time/span")).Text,
-                            UrlOffer = cardElement.FindElement(By.XPath("./a")).GetAttribute("href")
+                            WebSite = "SG",
+                            CompanieName = "Société Générale", // Ici, vous pouvez utiliser un nom spécifique pour chaque entreprise si nécessaire
+                            JobTitle = cardElement.FindElement(By.CssSelector(".hit-text > .text-extra-dark-gray")).Text,
+                            ContractType = cardElement.FindElement(By.CssSelector(".tags > .alternance > li")).Text,
+                            Location = cardElement.FindElement(By.CssSelector(".tags > .hit-details:nth-child(2) > li")).Text,
+                            Date = "Hier", // Vous pouvez obtenir la date si elle est disponible sur la page
+                            UrlOffer = cardElement.FindElement(By.CssSelector(".hit-text")).GetAttribute("href")
                         };
 
-                        WTTJjobOffers.Add(jobOffer);
+                        SGjobOffers.Add(jobOffer);
 
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Aucune offre en apprentissage trouvée sur Welcome to the Jungle.");
+                    Console.WriteLine("Aucune offre en apprentissage trouvée sur Société Générale.");
                 }
             }
             finally
@@ -65,7 +65,7 @@ namespace Aspi_backend.Services
                 driver.Quit();
             }
 
-            return WTTJjobOffers;
+            return SGjobOffers;
         }
 
         public async Task<string> GetHtmlContentAsync(string url)
@@ -79,7 +79,7 @@ namespace Aspi_backend.Services
             catch (HttpRequestException e)
             {
                 Console.WriteLine($"Une erreur s'est produite lors de la récupération du contenu de la page : {e.Message}");
-                throw; // Propager l'exception pour une gestion ultérieure
+                throw; // Retourner null en cas d'erreur
             }
         }
     }
