@@ -13,8 +13,9 @@ namespace Aspi_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHttpClient();
-            services.AddScoped<IScrapingService, WTTJScrapingService>();
+            services.AddScoped<IWTTJScrapingService, WTTJScrapingService>();
             services.AddScoped<LinkedinScrapingService>();
+            services.AddScoped<ISGScrapingService, SGScrapingService>();
             services.AddMvc();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

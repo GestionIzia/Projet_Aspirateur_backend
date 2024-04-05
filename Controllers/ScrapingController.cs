@@ -1,12 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using OpenQA.Selenium.Edge;
-using OpenQA.Selenium;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Aspi_backend.Models;
 using Aspi_backend.Services;
-using System.Threading.Tasks;
-using System.Threading;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Aspi_backend.Controllers
 {
@@ -14,38 +11,60 @@ namespace Aspi_backend.Controllers
     [Route("[controller]")]
     public class ScrapingController : ControllerBase
     {
-        private readonly IScrapingService _scrapingService;
+        private readonly IWTTJScrapingService _wttjScrapingService; 
+        private readonly ISGScrapingService _sgScrapingService; 
         private readonly LinkedinScrapingService _linkedinScrapingService;
 
-        public ScrapingController(IScrapingService scrapingService, LinkedinScrapingService linkedinScrapingService)
+        public ScrapingController(IWTTJScrapingService wttjScrapingService, ISGScrapingService sgScrapingService, LinkedinScrapingService linkedinScrapingService)
         {
-            _scrapingService = scrapingService;
+            _wttjScrapingService = wttjScrapingService;
+            _sgScrapingService = sgScrapingService;
             _linkedinScrapingService = linkedinScrapingService;
         }
 
         [HttpGet]
         [Route("scrape-wttj")]
-        public async Task<IActionResult> ScrapeHtmlContent()
+        public async Task<IActionResult> ScrapeWTTJ()
         {
             try
             {
-                var jobOffers = await _scrapingService.ScrapeJobOffers("WTTJ");
-                var jobOffersWithHtmlContent = new List<JobOffer>();
+                var jobOffers = await _wttjScrapingService.ScrapeWTTJOffers(); // Appel de la méthode ScrapeWTTJOffers
 
                 foreach (var jobOffer in jobOffers)
                 {
-                    var htmlContent = await _scrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
+                    var htmlContent = await _wttjScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
                     jobOffer.HtmlContent = htmlContent;
-                    jobOffersWithHtmlContent.Add(jobOffer);
                 }
 
-                return Ok(jobOffersWithHtmlContent);
-          
+                return Ok(jobOffers);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An error occurred while scraping job offers with HTML content: {ex.Message}");
-                return new StatusCodeResult(500);
+                Console.WriteLine($"An error occurred while scraping WTTJ job offers with HTML content: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("scrape-sg")]
+        public async Task<IActionResult> ScrapeSG()
+        {
+            try
+            {
+                var jobOffers = await _sgScrapingService.ScrapeSGOffers(); // Appel de la méthode ScrapeSGOffers
+
+                foreach (var jobOffer in jobOffers)
+                {
+                    var htmlContent = await _sgScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
+                    jobOffer.HtmlContent = htmlContent;
+                }
+
+                return Ok(jobOffers);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while scraping SG job offers with HTML content: {ex.Message}");
+                return StatusCode(500);
             }
         }
 
@@ -64,6 +83,5 @@ namespace Aspi_backend.Controllers
                 return StatusCode(500);
             }
         }
-
     }
 }
