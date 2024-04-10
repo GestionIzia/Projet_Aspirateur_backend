@@ -38,7 +38,7 @@ namespace Aspi_backend.Services
                 if (cardElements != null)
                 {
                     Console.WriteLine("Offres en apprentissage sur Société Générale :");
-                    foreach (var cardElement in cardElements.Take(5))
+                    foreach (var cardElement in cardElements.Take(12))
                     {
                         JobOffer jobOffer = new JobOffer
                         {
