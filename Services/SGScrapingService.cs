@@ -38,7 +38,7 @@ namespace Aspi_backend.Services
                 if (cardElements != null)
                 {
                     Console.WriteLine("Offres en apprentissage sur Société Générale :");
-                    foreach (var cardElement in cardElements.Take(12))
+                    foreach (var cardElement in cardElements.Take(20))
                     {
                         JobOffer jobOffer = new JobOffer
                         {
@@ -47,8 +47,9 @@ namespace Aspi_backend.Services
                             JobTitle = cardElement.FindElement(By.CssSelector(".hit-text > .text-extra-dark-gray")).Text,
                             ContractType = cardElement.FindElement(By.CssSelector(".tags > .alternance > li")).Text,
                             Location = cardElement.FindElement(By.CssSelector(".tags > .hit-details:nth-child(2) > li")).Text,
-                            Date = "Hier", // Vous pouvez obtenir la date si elle est disponible sur la page
-                            UrlOffer = cardElement.FindElement(By.CssSelector(".hit-text")).GetAttribute("href")
+                            //Date = "hier", // Vous pouvez obtenir la date si elle est disponible sur la page
+                            UrlOffer = cardElement.FindElement(By.CssSelector(".hit-text")).GetAttribute("href"),
+                            Type = 2 //Type 1 = CareerCenter
                         };
 
                         SGjobOffers.Add(jobOffer);
@@ -64,10 +65,12 @@ namespace Aspi_backend.Services
             {
                 driver.Quit();
             }
-
             return SGjobOffers;
         }
-
+        /*
+ Infos a scrapper : //*[@id="offer-240004NE-en"]/section[2]
+                    //*[@id="offer-240004NE-en"]/section[3]
+ */
         public async Task<string> GetHtmlContentAsync(string url)
         {
             try

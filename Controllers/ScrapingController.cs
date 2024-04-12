@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Xml;
 using Aspi_backend.Models;
 using Aspi_backend.Services;
 using Microsoft.AspNetCore.Mvc;
+using OpenQA.Selenium;
+using HtmlAgilityPack;
+using Aspi_backend.Services.Helpers;
 
 namespace Aspi_backend.Controllers
 {
@@ -57,6 +61,23 @@ namespace Aspi_backend.Controllers
                 {
                     var htmlContent = await _sgScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
                     jobOffer.HtmlContent = htmlContent;
+
+                    // Utilisation de HtmlAgilityPack pour extraire la date
+                    HtmlDocument doc = new HtmlDocument();
+                    doc.LoadHtml(htmlContent);
+                    // Recherche de l'élément span avec un enfant strong
+                    var dateNode = doc.DocumentNode.SelectSingleNode("//div[1]/div/div/div[4]/span/strong");
+
+                    // Si l'élément est trouvé, récupérer le texte à l'intérieur (la date)
+                    if (dateNode != null)
+                    {
+                        jobOffer.Date = DateHelper.FormatDate(dateNode.InnerText);
+                    }
+                    else
+                    {
+                        // Si aucun élément correspondant n'est trouvé, définir la date sur null ou une valeur par défaut
+                        jobOffer.Date = null;
+                    }
                 }
 
                 return Ok(jobOffers);

@@ -11,5 +11,7 @@ namespace Aspi_backend.Models
         public string? Date { get; set; }
         public string? UrlOffer { get; set; }
         public string? HtmlContent { get; set; }
+
+        public int? Type { get; set; } // (Jobboard = 1, CareerCenter = 2)
     }
 }
