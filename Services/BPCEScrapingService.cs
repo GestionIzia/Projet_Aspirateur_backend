@@ -8,18 +8,18 @@ using OpenQA.Selenium.Edge;
 
 namespace Aspi_backend.Services
 {
-    public class SGScrapingService : ISGScrapingService
+    public class BPCEScrapingService : IBPCEScrapingService
     {
         private readonly HttpClient _httpClient;
 
-        public SGScrapingService(HttpClient httpClient)
+        public BPCEScrapingService(HttpClient httpClient)
         {
             _httpClient = httpClient;
         }
 
-        public async Task<List<JobOffer>> ScrapeSGOffers() // Renommer la méthode ici
+        public async Task<List<JobOffer>> ScrapeBPCEOffers() // Renommer la méthode ici
         {
-            List<JobOffer> SGjobOffers = new List<JobOffer>();
+            List<JobOffer> BPCEjobOffers = new List<JobOffer>();
 
             var edgeDriverPath = "C:\\Users\\Bradley GOEH AKUE\\Desktop\\ME\\msedgedriver.exe";
             var edgeOptions = new EdgeOptions();
@@ -29,48 +29,53 @@ namespace Aspi_backend.Services
             try
             {
 
-                driver.Navigate().GoToUrl("https://careers.societegenerale.com/rechercher?refinementList[jobType][0]=APPRENTICESHIP");
+                driver.Navigate().GoToUrl("https://recrutement.bpce.fr/offres-emploi?tax_contract=contrat-en-alternance,fr_contrat-en-alternance&tax_place=ile-de-france&external=false");
                 await Task.Delay(5000); // Utiliser Task.Delay au lieu de Thread.Sleep dans un contexte asynchrone
 
-                var cardElements = driver.FindElements(By.CssSelector(".oJob-offer"));
-                //*[@id="240006UD-fr"]/div[2]/a
-                //*[@id="240005HK-fr"]/div[2]/a
+                IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
+                js.ExecuteScript("document.getElementById('tarteaucitronClose').click();");
 
-                Console.WriteLine("Offres en apprentissage sur Société Générale :");
+                js.ExecuteScript("document.querySelector('.js-loadmore').click();");
+                Thread.Sleep(2000);
+
+                var cardElements = driver.FindElements(By.XPath("//*[@id=\"root\"]/div/div/main/div[2]/div/div/div[1]/div[1]/div[position() <= 15]"));
+
+
+                Console.WriteLine("Offres en apprentissage sur BPCE :");
                 foreach (var cardElement in cardElements.Take(20))
                 {
                     try
                     {
                         JobOffer jobOffer = new JobOffer
                         {
-                            WebSite = "SG",
-                            CompanieName = "Société Générale", // Ici, vous pouvez utiliser un nom spécifique pour chaque entreprise si nécessaire
-                            JobTitle = cardElement.FindElement(By.CssSelector(".hit-text > .text-extra-dark-gray")).Text,
-                            ContractType = cardElement.FindElement(By.CssSelector(".tags > .alternance > li")).Text,
-                            Location = cardElement.FindElement(By.CssSelector(".tags > .hit-details:nth-child(2) > li")).Text,
-                            //Date = "hier", // Vous pouvez obtenir la date si elle est disponible sur la page
-                            UrlOffer = cardElement.FindElement(By.CssSelector(".hit-text")).GetAttribute("href"),
-                            Type = 2 //Type 1 = CareerCenter
+                            WebSite = "BPCE",
+                            CompanieName = "BPCE " + cardElement.FindElement(By.XPath("a/div[1]/div")).Text,
+                            JobTitle = cardElement.FindElement(By.XPath("a")).Text,
+                            ContractType = cardElement.FindElement(By.XPath("a/div[1]/ul/li[1]")).Text,
+                            Location = cardElement.FindElement(By.XPath("a/div[1]/ul/li[3]")).Text,
+                            Date = "Indisponible",
+                            UrlOffer = cardElement.FindElement(By.XPath("a")).GetAttribute("href"),
+                            Type = 1 //Type 1 = CareerCenter
                         };
 
-                        SGjobOffers.Add(jobOffer);
+                        BPCEjobOffers.Add(jobOffer);
 
                     }
                     catch (Exception ex)
                     {
                         // En cas d'erreur, ajoutez une offre d'emploi avec des valeurs par défaut
                         Console.WriteLine($"An error occurred while processing job offer: {ex.Message}");
-                        SGjobOffers.Add(new JobOffer
+                        BPCEjobOffers.Add(new JobOffer
                         {
-                            WebSite = "SG",
-                            CompanieName = "Société Générale",
+                            WebSite = "BPCE",
+                            CompanieName = "BPCE",
                             JobTitle = "???",
                             Location = "???",
                             Date = "???",
                             UrlOffer = "???",
                             ContractType = "???",
                             //HtmlContent = mainContentElement.FindElement(By.XPath("div")).GetAttribute("outerHTML"),
-                            Type = 2 //Type 1 = Jobboard
+                            Type = 1 //Type 1 = Jobboard
                         });
                     }
                 }
@@ -79,7 +84,7 @@ namespace Aspi_backend.Services
             {
                 driver.Quit();
             }
-            return SGjobOffers;
+            return BPCEjobOffers;
         }
         /*
  Infos a scrapper : //*[@id="offer-240004NE-en"]/section[2]
