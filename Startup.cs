@@ -15,7 +15,9 @@ namespace Aspi_backend
             services.AddHttpClient();
             services.AddScoped<LinkedinScrapingService>();
             services.AddScoped<IWTTJScrapingService, WTTJScrapingService>();
+            services.AddScoped<IBPCEScrapingService, BPCEScrapingService>();
             services.AddScoped<ISGScrapingService, SGScrapingService>();
+            services.AddScoped<IHWScrapingService, HWScrapingService>();
             services.AddMvc();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();

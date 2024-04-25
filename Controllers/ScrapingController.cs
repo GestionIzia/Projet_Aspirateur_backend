@@ -18,12 +18,16 @@ namespace Aspi_backend.Controllers
         private readonly IWTTJScrapingService _wttjScrapingService; 
         private readonly ISGScrapingService _sgScrapingService; 
         private readonly LinkedinScrapingService _linkedinScrapingService;
+        private readonly IBPCEScrapingService _bpceScrapingService;
+        private readonly IHWScrapingService _hwScrapingService;
 
-        public ScrapingController(IWTTJScrapingService wttjScrapingService, ISGScrapingService sgScrapingService, LinkedinScrapingService linkedinScrapingService)
+        public ScrapingController(IWTTJScrapingService wttjScrapingService, ISGScrapingService sgScrapingService, LinkedinScrapingService linkedinScrapingService, IBPCEScrapingService bpceScrapingService, IHWScrapingService hwScrapingService)
         {
             _wttjScrapingService = wttjScrapingService;
             _sgScrapingService = sgScrapingService;
             _linkedinScrapingService = linkedinScrapingService;
+            _bpceScrapingService = bpceScrapingService;
+            _hwScrapingService = hwScrapingService;
         }
 
         [HttpGet]
@@ -101,6 +105,68 @@ namespace Aspi_backend.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred while scraping LinkedIn job offers: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
+        [HttpGet]
+        [Route("scrape-bpce")]
+        public async Task<IActionResult> ScrapeBPCE()
+        {
+            try
+            {
+                var jobOffers = await _bpceScrapingService.ScrapeBPCEOffers(); // Appel de la méthode ScrapeSGOffers
+
+                foreach (var jobOffer in jobOffers)
+                {
+                    var htmlContent = await _bpceScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
+                    jobOffer.HtmlContent = htmlContent;
+                }
+
+                return Ok(jobOffers);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while scraping WTTJ job offers with HTML content: {ex.Message}");
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("scrape-hw")]
+        public async Task<IActionResult> ScrapeHW()
+        {
+            try
+            {
+                var jobOffers = await _hwScrapingService.ScrapeHWOffers(); // Appel de la méthode ScrapeSGOffers
+
+                foreach (var jobOffer in jobOffers)
+                {
+
+                    var htmlContent = await _hwScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
+                    jobOffer.HtmlContent = htmlContent;
+                    HtmlDocument doc = new HtmlDocument();
+                    doc.LoadHtml(htmlContent);
+
+                    // Recherche de l'élément span contenant la date
+                    var dateNode = doc.DocumentNode.SelectSingleNode("//span[contains(@class, 'tw-text-grey') and contains(text(), 'Publiée le')]");
+                    if (dateNode != null)
+                    {
+                        string dateText = dateNode.InnerText.Trim();
+                        string date = dateText.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries)[0].Replace("Publiée le ", "");
+                        jobOffer.Date = DateHelper.FormatDate(date);
+
+                    }
+                    else
+                    {
+                        jobOffer.Date = "???"; // Si aucune date n'est trouvée, la date est définie sur null
+                    }
+                }
+
+                return Ok(jobOffers);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred while scraping WTTJ job offers with HTML content: {ex.Message}");
                 return StatusCode(500);
             }
         }

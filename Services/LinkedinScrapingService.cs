@@ -32,7 +32,7 @@ namespace Aspi_backend.Services
                 Thread.Sleep(10000);
 
                 // Chemin d'accès pour les offres en apprentissage
-                var cardElements = driver.FindElements(By.XPath("//*[@id=\"main-content\"]/section/ul/li[position() <= 10]"));
+                var cardElements = driver.FindElements(By.XPath("//*[@id=\"main-content\"]/section/ul/li[position() <= 15]"));
 
                 // Recherche des éléments représentant chaque carte d'offre
                 foreach (var cardElement in cardElements)
@@ -84,7 +84,7 @@ namespace Aspi_backend.Services
             }
             finally
             {
-                driverOffer.Quit();
+                //driverOffer.Quit();
                 driver.Quit();
             }
 

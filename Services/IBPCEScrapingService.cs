@@ -1,0 +1,11 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Aspi_backend.Models;
+
+namespace Aspi_backend.Services
+{
+    public interface IBPCEScrapingService : IScrapingService
+    {
+        Task<List<JobOffer>> ScrapeBPCEOffers();
+    }
+}
