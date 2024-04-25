@@ -38,7 +38,7 @@ namespace Aspi_backend.Services
             //js.ExecuteScript("document.querySelector('.js-loadmore').click();");
             //Thread.Sleep(2000);
 
-            var cardElements = driver.FindElements(By.XPath("/html/body/main/section/div/section/ul[1]/li[position() <= 20]"));
+            var cardElements = driver.FindElements(By.XPath("/html/body/main/section/div/section/ul[1]/li[position() <= 15]"));
 
 
             Console.WriteLine("Offres en apprentissage sur Hello Work :");
@@ -79,8 +79,9 @@ namespace Aspi_backend.Services
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(htmlContent);
 
-            var jobTitleNode = doc.DocumentNode.SelectSingleNode("/html/body/main/div[3]/div[3]/div/div[1]/div/div[1]/h1/span[1]");
-            var companyNameNode = doc.DocumentNode.SelectSingleNode("/html/body/main/div[3]/div[3]/div/div[1]/div/div[1]/h1/span[2]");
+            var jobTitleNode = doc.DocumentNode.SelectSingleNode("/html/body/main/div[4]/div[3]/div/div[1]/div/div[1]/h1/span[1]");
+            
+            var companyNameNode = doc.DocumentNode.SelectSingleNode("/html/body/main/div[4]/div[3]/div/div[1]/div/div[1]/h1/span[2]");
             var locationNode = doc.DocumentNode.SelectSingleNode("//li[contains(@class, 'tw-tag-contract-s')]");
             var contractTypeNode = doc.DocumentNode.SelectSingleNode("//span[contains(@class, 'tw-text-grey')][2]");
 
@@ -88,6 +89,26 @@ namespace Aspi_backend.Services
             string companyName = companyNameNode?.InnerText.Trim() ?? "Nom de l'entreprise non trouvé";
             string location = locationNode?.InnerText.Trim() ?? "Lieu non trouvé";
             string contractType = contractTypeNode?.InnerText.Trim() ?? "Type de contrat non trouvé";
+
+            jobTitle = jobTitle.Replace("&#xE9;", "é");
+            companyName = companyName.Replace("&#xE9;", "é");
+            location = location.Replace("&#xE9;", "é");
+            contractType = contractType.Replace("&#xE9;", "é");
+            
+            jobTitle = jobTitle.Replace("&#xB7;", "·");
+            companyName = companyName.Replace("&#xB7;", "·");
+            location = location.Replace("&#xB7;", "·");
+            contractType = contractType.Replace("&#xB7;", "·");
+
+            jobTitle = jobTitle.Replace("&#xF4;", "ô");
+            companyName = companyName.Replace("&#xF4;", "ô");
+            location = location.Replace("&#xF4;", "ô");
+            contractType = contractType.Replace("&#xF4;", "ô");
+
+            jobTitle = jobTitle.Replace("&#x27;", "'");
+            companyName = companyName.Replace("&#x27;", "'");
+            location = location.Replace("&#x27;", "'");
+            contractType = contractType.Replace("&#x27;", "'");
 
             return (jobTitle, companyName, location, contractType);
         }

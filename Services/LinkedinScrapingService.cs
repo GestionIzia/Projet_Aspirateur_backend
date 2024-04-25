@@ -76,7 +76,7 @@ namespace Aspi_backend.Services
                             Date = "???",
                             UrlOffer = cardElement.FindElement(By.XPath("div/a")).GetAttribute("href"),
                             ContractType = "???",
-                            //HtmlContent = mainContentElement.FindElement(By.XPath("div")).GetAttribute("outerHTML"),
+                            HtmlContent ="???",
                         Type = 1 //Type 1 = Jobboard
                         });
                     }

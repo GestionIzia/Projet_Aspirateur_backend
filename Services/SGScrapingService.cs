@@ -37,7 +37,7 @@ namespace Aspi_backend.Services
                 //*[@id="240005HK-fr"]/div[2]/a
 
                 Console.WriteLine("Offres en apprentissage sur Société Générale :");
-                foreach (var cardElement in cardElements.Take(20))
+                foreach (var cardElement in cardElements.Take(15))
                 {
                     try
                     {

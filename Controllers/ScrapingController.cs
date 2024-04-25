@@ -118,8 +118,8 @@ namespace Aspi_backend.Controllers
 
                 foreach (var jobOffer in jobOffers)
                 {
-                    var htmlContent = await _bpceScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
-                    jobOffer.HtmlContent = htmlContent;
+                    //var htmlContent = await _bpceScrapingService.GetHtmlContentAsync(jobOffer.UrlOffer);
+                    //jobOffer.HtmlContent = htmlContent;
                 }
 
                 return Ok(jobOffers);

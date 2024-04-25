@@ -33,7 +33,7 @@ namespace Aspi_backend.Services
 
                 await Task.Delay(5000); // Utiliser Task.Delay au lieu de Thread.Sleep dans un contexte asynchrone
 
-                var cardElements = driver.FindElements(By.XPath("//*[@id='pages_jobs']/div[2]/div/ul/li[position() <= 50]/div/div"));
+                var cardElements = driver.FindElements(By.XPath("//*[@id='pages_jobs']/div[2]/div/ul/li[position() <= 15]/div/div"));
 
                 if (cardElements != null)
                 {

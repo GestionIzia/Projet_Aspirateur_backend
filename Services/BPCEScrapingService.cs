@@ -25,6 +25,7 @@ namespace Aspi_backend.Services
             var edgeOptions = new EdgeOptions();
             edgeOptions.AddArgument("headless"); // Active le mode headless
             var driver = new EdgeDriver(edgeDriverPath, edgeOptions);
+            var driverOffer = new EdgeDriver(edgeDriverPath, edgeOptions);
 
             try
             {
@@ -42,7 +43,7 @@ namespace Aspi_backend.Services
 
 
                 Console.WriteLine("Offres en apprentissage sur BPCE :");
-                foreach (var cardElement in cardElements.Take(20))
+                foreach (var cardElement in cardElements.Take(15))
                 {
                     try
                     {
@@ -53,13 +54,23 @@ namespace Aspi_backend.Services
                             JobTitle = cardElement.FindElement(By.XPath("a")).Text,
                             ContractType = cardElement.FindElement(By.XPath("a/div[1]/ul/li[1]")).Text,
                             Location = cardElement.FindElement(By.XPath("a/div[1]/ul/li[3]")).Text,
-                            Date = "Indisponible",
+                            Date = "indisponible",
                             UrlOffer = cardElement.FindElement(By.XPath("a")).GetAttribute("href"),
-                            Type = 1 //Type 1 = CareerCenter
+                            Type = 1 //Type 1 = Jobboards
                         };
 
-                        BPCEjobOffers.Add(jobOffer);
 
+
+                        driverOffer.Navigate().GoToUrl(jobOffer.UrlOffer);
+
+                        // Attendre que la page soit entièrement chargée (peut être remplacé par d'autres mécanismes d'attente)
+                        await Task.Delay(5000);
+
+                        // Localiser l'élément principal et obtenir son attribut outerHTML
+                        var mainContentElement = driverOffer.FindElement(By.XPath("//*[@id=\"root\"]/div/div/main/div[2]/div"));
+                        jobOffer.HtmlContent = mainContentElement.FindElement(By.XPath("div/div[1]/div[1]")).GetAttribute("outerHTML");
+
+                        BPCEjobOffers.Add(jobOffer);
                     }
                     catch (Exception ex)
                     {
@@ -72,11 +83,12 @@ namespace Aspi_backend.Services
                             JobTitle = "???",
                             Location = "???",
                             Date = "???",
-                            UrlOffer = "???",
+                            UrlOffer = cardElement.FindElement(By.XPath("a")).GetAttribute("href"),
                             ContractType = "???",
-                            //HtmlContent = mainContentElement.FindElement(By.XPath("div")).GetAttribute("outerHTML"),
+                            HtmlContent = "???",
                             Type = 1 //Type 1 = Jobboard
                         });
+
                     }
                 }
             }
